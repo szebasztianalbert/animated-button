@@ -41,11 +41,12 @@ class _MyHomePageState extends State<MyHomePage> {
           AnimatedButton(
             width: 170,
             height: 80,
-            loadingAnimationDuration: Duration(seconds: 1),
-            enabledButtonBackgroundColor: Colors.black,
-            disabledButtonBackgroundColor: Colors.blue,
-            loadingAnimationColor: Colors.lightGreen,
-            textColor: Colors.red,
+            debouncingTimer: Duration(seconds: 1),
+            backgroundColor: Colors.black,
+            disabledBackgroundColor: Colors.blue,
+            debouncingAnimationColor: Colors.lightGreen,
+            circularProgressIndicatorColor: Colors.lightBlueAccent,
+            foregroundColor: Colors.red,
             buttonText: 'Customized',
           ),
           SizedBox(

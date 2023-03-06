@@ -2,35 +2,35 @@ import 'dart:async';
 import 'package:flutter/material.dart';
 
 class AnimatedButton extends StatefulWidget {
-  final Duration loadingAnimationDuration;
-  final Color enabledButtonBackgroundColor;
-  final Color disabledButtonBackgroundColor;
-  final Color loadingAnimationColor;
+  final Duration debouncingTimer;
+  final Color backgroundColor;
+  final Color disabledBackgroundColor;
+  final Color debouncingAnimationColor;
   final Color circularProgressIndicatorColor;
-  final Color textColor;
-  final Color inactiveTextColor;
+  final Color foregroundColor;
   final double height;
   final double? width;
   final double circularProgressIndicatorStrokeWidth;
   final double borderRadius;
   final String buttonText;
   final bool enabled;
+  final EdgeInsetsGeometry padding;
 
   const AnimatedButton({
     super.key,
-    this.loadingAnimationDuration = const Duration(seconds: 3),
-    this.enabledButtonBackgroundColor = Colors.yellow,
-    this.disabledButtonBackgroundColor = Colors.grey,
-    this.loadingAnimationColor = Colors.green,
+    this.debouncingTimer = const Duration(seconds: 3),
+    this.backgroundColor = Colors.yellow,
+    this.disabledBackgroundColor = Colors.grey,
+    this.debouncingAnimationColor = Colors.green,
     this.circularProgressIndicatorColor = Colors.yellow,
-    this.textColor = Colors.white,
-    this.inactiveTextColor = Colors.black38,
+    this.foregroundColor = Colors.white,
     this.width,
-    this.height = 50,
+    this.height = 70,
     this.circularProgressIndicatorStrokeWidth = 4,
     this.borderRadius = 15,
     this.buttonText = '',
     this.enabled = true,
+    this.padding = const EdgeInsets.all(0),
   });
 
   @override
@@ -46,7 +46,7 @@ class _AnimatedButtonState extends State<AnimatedButton> with TickerProviderStat
   void initState() {
     controller = AnimationController(
       vsync: this,
-      duration: widget.loadingAnimationDuration,
+      duration: widget.debouncingTimer,
     )..addListener(() {
         setState(() {});
       });
@@ -61,6 +61,9 @@ class _AnimatedButtonState extends State<AnimatedButton> with TickerProviderStat
 
   @override
   Widget build(BuildContext context) {
+    final circularProgressSize = widget.height - 16;
+    const circularProgressPadding = 15.0;
+
     return SizedBox(
       width: double.infinity,
       child: LayoutBuilder(builder: (BuildContext context, BoxConstraints constraints) {
@@ -68,13 +71,13 @@ class _AnimatedButtonState extends State<AnimatedButton> with TickerProviderStat
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             SizedBox(
-              width: widget.height + constraints.maxWidth / 20,
+              width: circularProgressSize + circularProgressPadding,
             ),
             GestureDetector(
               onTapDown: (_) {
                 if (widget.enabled) {
                   controller.forward();
-                  loadingAnimationTimer = Timer(widget.loadingAnimationDuration, onLongPress);
+                  loadingAnimationTimer = Timer(widget.debouncingTimer, onLongPress);
                 }
               },
               onTapUp: (_) {
@@ -103,18 +106,21 @@ class _AnimatedButtonState extends State<AnimatedButton> with TickerProviderStat
                         height: widget.height,
                         child: LinearProgressIndicator(
                           value: controller.value,
-                          backgroundColor: widget.enabled
-                              ? widget.enabledButtonBackgroundColor
-                              : widget.disabledButtonBackgroundColor,
-                          valueColor: AlwaysStoppedAnimation(widget.loadingAnimationColor),
+                          backgroundColor: widget.enabled ? widget.backgroundColor : widget.disabledBackgroundColor,
+                          valueColor: AlwaysStoppedAnimation(widget.debouncingAnimationColor),
                         ),
                       ),
                       Positioned.fill(
                         child: Center(
-                          child: Text(
-                            widget.buttonText,
-                            style: TextStyle(
-                              color: widget.enabled ? widget.textColor : widget.inactiveTextColor,
+                          child: Padding(
+                            padding: const EdgeInsets.all(0),
+                            // padding: widget.padding,
+                            child: Text(
+                              widget.buttonText,
+                              style: TextStyle(
+                                // fontSize: 16,
+                                color: widget.foregroundColor,
+                              ),
                             ),
                           ),
                         ),
@@ -124,20 +130,20 @@ class _AnimatedButtonState extends State<AnimatedButton> with TickerProviderStat
                 ),
               ),
             ),
-            SizedBox(width: constraints.maxWidth / 20),
+            const SizedBox(width: circularProgressPadding),
             Visibility(
                 child: pressed
                     ? SizedBox(
-                        width: widget.height,
-                        height: widget.height,
+                        width: circularProgressSize,
+                        height: circularProgressSize,
                         child: CircularProgressIndicator(
                           strokeWidth: widget.circularProgressIndicatorStrokeWidth,
                           color: widget.circularProgressIndicatorColor,
                         ),
                       )
                     : SizedBox(
-                        width: widget.height,
-                        height: widget.height,
+                        width: circularProgressSize,
+                        height: circularProgressSize,
                       )),
           ],
         );
